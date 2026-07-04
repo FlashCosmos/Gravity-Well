@@ -58,6 +58,12 @@ You may see a confirmation prompt — approve it.
 
 That's it — nothing else to configure. Claude now automatically has access to Gravity Well's routing whenever it's useful.
 
+Want to see it in action right away? Type `/gravity-well:orchestrate` followed by a task, e.g.:
+
+```
+/gravity-well:orchestrate add a --json flag to the export command
+```
+
 **One thing to know:** if you're working in a temporary or remote environment that resets between sessions (for example, a fresh SSH connection each time), the install doesn't carry over. You'll need to repeat these steps the next time you connect to a brand-new environment.
 
 ## Want more detail?
