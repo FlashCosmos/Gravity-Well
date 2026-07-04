@@ -4,6 +4,8 @@ Cost-tiered model routing for Claude Code, built by FlashCosmos.
 
 Gravity Well spreads a task across model tiers instead of running everything through one model: a lightweight strategist plans and reviews, while implementation is routed to whichever tier actually matches the work's difficulty. The result is meaningfully lower token spend with no drop in output quality — the expensive reasoning goes into the reasoning, not into typing out code.
 
+**New to Claude Code plugins?** See [GETTING_STARTED.md](GETTING_STARTED.md) for a no-experience-required walkthrough.
+
 ## How it works
 
 | Stage | Agent | Model | Role |
@@ -16,10 +18,14 @@ If a `deepseek` MCP server is already registered on the machine, the bundled ski
 
 ## Installation
 
+**Terminal (`claude` CLI):**
+
 ```
 /plugin marketplace add FlashCosmos/Gravity-Well
 /plugin install gravity-well@flashcosmos-plugins
 ```
+
+**VSCode extension:** `/plugin` opens a *Manage Plugins* panel instead of taking inline arguments — typing the commands above as a single line returns "`/plugin` isn't available in this environment." Instead: type `/plugin` alone, open the **Marketplaces** tab, enter `FlashCosmos/Gravity-Well` and click **Add**, then switch to the **Plugins** tab and install `gravity-well` from there.
 
 Agents and the routing skill are namespaced automatically and are available immediately after install — nothing else to configure.
 
@@ -51,6 +57,8 @@ Validate changes with `claude plugin validate ./plugins/gravity-well` and bump `
 /plugin marketplace add /path/to/local/clone
 /plugin install gravity-well@flashcosmos-plugins
 ```
+
+(In the VSCode extension, paste the local path into the **Marketplaces** tab's input field instead.)
 
 ## Compatibility
 
