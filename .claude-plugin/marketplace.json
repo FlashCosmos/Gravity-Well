@@ -1,0 +1,11 @@
+{
+  "name": "flashcosmos-plugins",
+  "owner": { "name": "FlashCosmos" },
+  "plugins": [
+    {
+      "name": "gravity-well",
+      "source": "./plugins/gravity-well",
+      "description": "Cost-tiered model routing: Fable for strategy/review, Sonnet/Opus for implementation."
+    }
+  ]
+}
