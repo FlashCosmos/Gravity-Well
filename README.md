@@ -43,6 +43,10 @@ Run it with a task description as `args` via the Workflow tool, e.g. `{ name: "g
 
 The pipeline chains Plan (Fable) → Implement → Review (Fable). The strategist classifies each task as `standard` or `heavy` up front: standard work runs on Sonnet, heavy work starts directly on Opus with no wasted first attempt. All stage handoffs use structured output (JSON schemas), so escalation is an explicit `needs_escalation` status from the implementer rather than keyword-matching on prose. The reviewer audits the actual working tree (`git diff`), not the implementer's self-report, and if it rejects the result the findings go back to the implementing tier for one bounded fix round before anything is surfaced to you.
 
+### Design docs (best results on ambiguous features)
+
+For a feature with real ambiguity — multi-user authority, security, non-obvious data-model decisions — settle the design *before* dispatching. Talk it over interactively with Fable (`/model fable`), then capture the decisions in a doc following [`plugins/gravity-well/templates/design-doc-template.md`](plugins/gravity-well/templates/design-doc-template.md) and hand the pipeline the doc's path instead of a one-line task. The template ships with full authoring instructions and a "no placeholders" readiness gate. Fable can emit the filled doc as the last step of the discussion, so the reasoning that made the decisions also writes them down. Small changes don't need this — a one-line task string is fine.
+
 ## Customizing
 
 Tailor which model handles which kind of work by editing:
@@ -53,6 +57,7 @@ Tailor which model handles which kind of work by editing:
 | Routing logic, or how DeepSeek is treated | `plugins/gravity-well/skills/model-routing/SKILL.md` |
 | An agent's instructions | The body of `plugins/gravity-well/agents/*.md` |
 | Workflow phases, escalation, or fix rounds (`MAX_FIX_ROUNDS`) | `plugins/gravity-well/templates/gravity-well.workflow.js` (re-copy after editing) |
+| The design-doc template sections or instructions | `plugins/gravity-well/templates/design-doc-template.md` |
 | The `/gravity-well:orchestrate` command | `plugins/gravity-well/commands/orchestrate.md` |
 | Metadata or version | `plugins/gravity-well/.claude-plugin/plugin.json` |
 
@@ -78,7 +83,7 @@ plugins/gravity-well/
   agents/                            strategist, implementer, heavy-implementer
   commands/                          /gravity-well:orchestrate
   skills/model-routing/              Routing guidance
-  templates/                         Workflow script template
+  templates/                         Workflow script + design-doc template
 ```
 
 This repo doubles as its own marketplace so it can be installed with a single `/plugin marketplace add`. To add another plugin alongside Gravity Well later, create `plugins/<name>/` and register it in `.claude-plugin/marketplace.json`.

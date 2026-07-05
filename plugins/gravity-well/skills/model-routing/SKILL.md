@@ -20,6 +20,16 @@ Routing has overhead — each subagent starts cold and re-reads whatever it need
 - The user is asking a question or thinking out loud — answering is the deliverable, there's nothing to dispatch.
 - The task is mostly conversation with small bursts of code — the handoff costs more than it saves.
 
+## Design-doc-first for non-trivial features
+
+For a feature with real ambiguity — especially anything touching multi-user authority, security, or data-model decisions — the highest-leverage flow is to settle the design *before* dispatching:
+
+1. Discuss the feature interactively with the strategist tier (Fable) — tradeoffs, edge cases, authority/security surface. This is a real conversation, not a one-shot subagent call.
+2. Capture the decisions in a design doc following `templates/design-doc-template.md` (Fable can emit it directly as the final step of the discussion). It records *what and why*, not *how* — no code or file paths.
+3. Hand the doc's path to the pipeline: dispatch the implementer/strategist against "implement the design in `<path>`; it's already decided — verify and formalize, don't re-litigate."
+
+The payoff: the strategist grounds a settled design against real code instead of doing fresh ideation cold, and the reviewer at the end has explicit constraints and acceptance criteria to check against. Skip this for small changes where the doc costs more than it saves.
+
 ## Handoff rules
 
 - **Subagents share none of your context.** Include everything they need in the prompt: full file paths, constraints, the complete plan, and acceptance criteria. A vague handoff wastes the cheaper tier's tokens on rediscovery.

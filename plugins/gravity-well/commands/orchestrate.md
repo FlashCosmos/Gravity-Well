@@ -9,6 +9,8 @@ Run this task through the Gravity Well cost-tiered pipeline:
 
 If no task was given above, ask the user what they want built before doing anything else.
 
+**Ideal input:** for a non-trivial feature, the strongest task is a pointer to a finished design doc — e.g. "Implement the design in docs/design/<feature>.md; it's already decided, so verify it against the code and formalize a plan rather than re-litigating it." See `${CLAUDE_PLUGIN_ROOT}/templates/design-doc-template.md` for the shape such a doc should take. A one-line task string works fine for small changes; a design doc is what gets the best results on anything with real ambiguity.
+
 ## Preferred path: the Workflow script
 
 1. Check whether `~/.claude/workflows/gravity-well.js` exists.
