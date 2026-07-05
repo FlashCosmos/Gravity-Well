@@ -55,7 +55,7 @@ Auto-update is **off by default** for git-backed marketplaces like this one, so 
 - **VSCode extension:** `/plugin` → **Marketplaces** tab → select `flashcosmos-plugins` → **Update**, then reload the window.
 - Either client can flip on per-marketplace auto-update from the same panel to make future releases arrive at startup.
 
-If you copied the workflow template to `~/.claude/workflows/`, re-copy it after updating — that file doesn't update through the plugin system (`/gravity-well:orchestrate` handles the copy for you).
+The copied workflow file in `~/.claude/workflows/` doesn't update through the plugin system, but `/gravity-well:orchestrate` re-syncs it automatically whenever it differs from the plugin's template — you only need to re-copy manually if you invoke the Workflow tool directly without the command.
 
 **Maintainers:** bump `version` in `plugin.json` on **every** release. Clients pin to the version string — new commits without a bump are silently ignored.
 

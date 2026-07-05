@@ -21,9 +21,8 @@ The pipeline edits real files, so:
 
 ## Preferred path: the Workflow script
 
-1. Check whether `~/.claude/workflows/gravity-well.js` exists.
-2. If it exists, invoke the Workflow tool with `{ name: "gravity-well", args: { task: "<the task above>", scout: <true only if pre-flight step 3 said so> } }` and, when it completes, report the plan, what was implemented, whether it escalated to Opus, and the review verdict with any findings.
-3. If it does not exist, copy `${CLAUDE_PLUGIN_ROOT}/templates/gravity-well.workflow.js` to `~/.claude/workflows/gravity-well.js` (creating the directory if needed), tell the user this one-time setup happened, then invoke the Workflow as in step 2.
+1. Sync the template: if `~/.claude/workflows/gravity-well.js` is missing OR differs from `${CLAUDE_PLUGIN_ROOT}/templates/gravity-well.workflow.js` (a quick byte comparison settles it), copy the plugin's template over it (creating the directory if needed) and tell the user it was installed/refreshed. Exception: if the user has told you they deliberately customized their copy, ask before overwriting.
+2. Invoke the Workflow tool with `{ name: "gravity-well", args: { task: "<the task above>", scout: <true only if pre-flight step 3 said so> } }` and, when it completes, report the plan, what was implemented, whether it escalated to Opus, and the review verdict with any findings.
 
 ## Fallback: chain the agents directly
 
