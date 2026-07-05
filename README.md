@@ -49,18 +49,17 @@ Agents and the routing skill are namespaced automatically and are available imme
 
 ### Updating
 
-Auto-update is **off by default** for git-backed marketplaces like this one, so already-installed users pull new releases manually:
+Auto-update is **off by default** for git-backed marketplaces like this one, so already-installed users pull new releases manually.
 
-- **Terminal:** `/plugin marketplace update flashcosmos-plugins`, then restart Claude Code to activate the new version.
-- **VSCode extension:** `/plugin` → **Marketplaces** tab → click the **refresh icon** (circular arrows, next to the trash icon) on the `flashcosmos-plugins` row, then reload the window.
-- In the terminal client, per-marketplace auto-update can also be flipped on from the `/plugin` panel to make future releases arrive at startup.
+**Terminal (`claude` CLI):** `/plugin marketplace update flashcosmos-plugins`, then restart Claude Code to activate the new version. Per-marketplace auto-update can also be flipped on from the `/plugin` panel to make future releases arrive at startup.
 
-**If the version doesn't seem to change after that (VSCode):** version resolution has three separate layers on disk — the marketplace's own git clone, a versioned cache per plugin version, and `installed_plugins.json` (the actual pointer every session reads). The refresh icon only updates the first layer; reloading the window alone updates none of them. In practice:
+**VSCode extension:** the only method confirmed to actually update the installed version is a full uninstall and reinstall:
 
-- Toggling `gravity-well` **off, then back on** in the **Plugins** tab pre-fetches the new version into the cache layer, but does **not** reliably rewrite `installed_plugins.json` — sessions can keep reporting the old version indefinitely even after this.
-- The **only reliable fix found so far**: click the **trash icon** on the **Plugins** tab to fully uninstall `gravity-well`, then reinstall it. A real (re)install is what actually rewrites `installed_plugins.json` with the new version, path, and commit SHA — confirm by checking the "installed" version a session reports.
+1. `/plugin` → **Plugins** tab → click the **trash icon** on `gravity-well@flashcosmos-plugins` to uninstall it.
+2. Reinstall it the same way as [Installation](#installation) above.
+3. Confirm it took: ask a fresh Claude Code session what version of Gravity Well is installed.
 
-(Note: `/reload-plugins` is not a real command in the VSCode extension — don't rely on it.)
+Version resolution here has three separate layers on disk — the marketplace's git clone, a versioned plugin cache, and `installed_plugins.json` (the actual pointer every session reads) — and a full reinstall is what reliably rewrites all three. **The Marketplaces tab's refresh icon, reloading the window, and toggling the plugin off/on were all tested and do not reliably update the installed version** — don't spend time on them. (`/reload-plugins` also does not exist as a command in the VSCode extension.)
 
 The copied workflow file in `~/.claude/workflows/` doesn't update through the plugin system, but `/gravity-well:orchestrate` re-syncs it automatically whenever it differs from the plugin's template — you only need to re-copy manually if you invoke the Workflow tool directly without the command.
 
