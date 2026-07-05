@@ -18,6 +18,22 @@ The bundled `model-routing` skill teaches the main session when to route (and, j
 
 If a `deepseek` MCP server is already registered on the machine, the bundled skill will also suggest it for large, mechanical, multi-file edits. That integration is optional — nothing changes if the server isn't present.
 
+## How to run a feature through Gravity Well
+
+The design-first flow, end to end. Use it for anything with real ambiguity — multi-user authority, security, non-obvious data-model decisions. (For a small, obvious change, skip straight to step 5 with a one-line task string.)
+
+1. **Switch to the strategist tier.** Run `/model fable` so the planning conversation happens on the top reasoning tier.
+2. **Talk the feature over.** Discuss it interactively with Fable — the tradeoffs, edge cases, and especially any authority/security surface. This is a real back-and-forth; land the decisions before writing anything down.
+3. **Have Fable emit the design doc.** When you've converged, ask: *"emit our decision as a design doc using the template in `plugins/gravity-well/templates/design-doc-template.md`."* Fable writes the filled doc — so the reasoning that made the decisions also records them, with no transcription drift. Save it somewhere in your repo, e.g. `docs/design/<feature>.md`.
+4. **Confirm it's ready.** The doc must have zero `FILL:` markers left, Status set to "Ready for implementation", and an empty "Open questions" section. (`grep FILL: docs/design/<feature>.md` returning nothing is the quick check.)
+5. **Hand it to the pipeline.** Run:
+
+   ```
+   /gravity-well:orchestrate Implement the design in docs/design/<feature>.md; it's already decided — verify it against the code and formalize a plan, don't re-litigate the decisions.
+   ```
+
+   The pipeline plans (Fable) → implements (Sonnet, or Opus if warranted) → reviews (Fable), then hands you back the plan, what changed, whether it escalated, and the review verdict.
+
 ## Installation
 
 **Terminal (`claude` CLI):**
