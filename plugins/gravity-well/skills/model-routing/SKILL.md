@@ -30,6 +30,14 @@ For a feature with real ambiguity — especially anything touching multi-user au
 
 The payoff: the strategist grounds a settled design against real code instead of doing fresh ideation cold, and the reviewer at the end has explicit constraints and acceptance criteria to check against. Skip this for small changes where the doc costs more than it saves.
 
+## Scouting large territory (default: off)
+
+The strategist exploring first-hand is the most accurate path — detective work is iterative, and intent and search belong in the same head. Keep that as the default. But when the relevant territory is genuinely large (several hundred+ files in play, or a codebase nobody in the conversation knows), first-hand exploration starts *costing* accuracy by flooding the planner's context with raw file dumps. Then, and only then:
+
+1. Have a cheap tier build a map first: the built-in `Explore` agent (or a Haiku subagent, or DeepSeek if registered) sweeps the relevant territory and returns a compact map — paths with roles, key symbols with `path:line` locations, and explicit caveats about what it did NOT explore.
+2. Pass the map into the strategist's prompt, framed as an index, not gospel — the strategist spot-checks load-bearing claims and explores gaps itself.
+3. Reuse the same map in the implementer and reviewer handoffs — one scout, every stage benefits; don't make three agents rediscover the same files.
+
 ## Handoff rules
 
 - **Subagents share none of your context.** Include everything they need in the prompt: full file paths, constraints, the complete plan, and acceptance criteria. A vague handoff wastes the cheaper tier's tokens on rediscovery.

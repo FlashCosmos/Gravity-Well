@@ -47,6 +47,18 @@ The design-first flow, end to end. Use it for anything with real ambiguity — m
 
 Agents and the routing skill are namespaced automatically and are available immediately after install — nothing else to configure.
 
+### Updating
+
+Auto-update is **off by default** for git-backed marketplaces like this one, so already-installed users pull new releases manually:
+
+- **Terminal:** `/plugin marketplace update flashcosmos-plugins`, then `/reload-plugins` (or restart) to activate the new version mid-session.
+- **VSCode extension:** `/plugin` → **Marketplaces** tab → select `flashcosmos-plugins` → **Update**, then reload the window.
+- Either client can flip on per-marketplace auto-update from the same panel to make future releases arrive at startup.
+
+If you copied the workflow template to `~/.claude/workflows/`, re-copy it after updating — that file doesn't update through the plugin system (`/gravity-well:orchestrate` handles the copy for you).
+
+**Maintainers:** bump `version` in `plugin.json` on **every** release. Clients pin to the version string — new commits without a bump are silently ignored.
+
 ### Workflow template
 
 Claude Code plugins can't yet bundle a runnable Workflow script directly, so `plugins/gravity-well/templates/gravity-well.workflow.js` needs a one-time copy per machine:
@@ -57,7 +69,9 @@ cp plugins/gravity-well/templates/gravity-well.workflow.js ~/.claude/workflows/g
 
 Run it with a task description as `args` via the Workflow tool, e.g. `{ name: "gravity-well", args: "add pagination to the users list endpoint" }` — or just use `/gravity-well:orchestrate <task>`, which copies the template into place on first use and then invokes it for you.
 
-The pipeline chains Plan (Fable) → Implement → Review (Fable). The strategist classifies each task as `standard` or `heavy` up front: standard work runs on Sonnet, heavy work starts directly on Opus with no wasted first attempt. All stage handoffs use structured output (JSON schemas), so escalation is an explicit `needs_escalation` status from the implementer rather than keyword-matching on prose. The reviewer audits the actual working tree (`git diff`), not the implementer's self-report, and if it rejects the result the findings go back to the implementing tier for one bounded fix round before anything is surfaced to you.
+The pipeline chains Plan (Fable) → Implement → Review (Fable). The strategist classifies each task as `standard` or `heavy` up front: standard work runs on Sonnet, heavy work starts directly on Opus with no wasted first attempt. All stage handoffs use structured output (JSON schemas), so escalation is an explicit `needs_escalation` status from the implementer rather than keyword-matching on prose. The reviewer audits the actual working tree (`git diff`) and runs the acceptance checks where runnable — it does not trust the implementer's self-report — and if it rejects the result the findings go back to the implementing tier for one bounded fix round before anything is surfaced to you.
+
+**Optional Scout phase (off by default):** pass `args: { task: "...", scout: true }` to have Haiku map the relevant territory first; the strategist, implementer, and reviewer all reuse that map instead of re-discovering the same files. Scouting is deliberately not the default — the strategist exploring first-hand is the most accurate path, and the scout exists only for codebases large enough that raw exploration would drown the planner's context. `/gravity-well:orchestrate` makes this call for you during pre-flight (it also checks you're on a clean git tree before any files get touched).
 
 ### Design docs (best results on ambiguous features)
 
