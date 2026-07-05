@@ -18,12 +18,18 @@ export const meta = {
   ],
 }
 
-const task = typeof args === 'string' ? args.trim()
-  : (args && typeof args.task === 'string') ? args.task.trim() : ''
+// Accept: a plain task string, a {task, scout} object, or (defensively) a
+// JSON-encoded string of that object — callers sometimes stringify args by mistake.
+let input = args
+if (typeof input === 'string' && input.trim().startsWith('{')) {
+  try { input = JSON.parse(input) } catch (e) { /* treat as a literal task string */ }
+}
+const task = typeof input === 'string' ? input.trim()
+  : (input && typeof input.task === 'string') ? input.task.trim() : ''
 if (!task) {
   throw new Error('gravity-well needs a task description, e.g. { name: "gravity-well", args: "add pagination to the users list endpoint" }')
 }
-const wantScout = !!(args && typeof args === 'object' && args.scout)
+const wantScout = !!(input && typeof input === 'object' && input.scout)
 
 const MAP_SCHEMA = {
   type: 'object',

@@ -70,8 +70,10 @@ The copied workflow file in `~/.claude/workflows/` doesn't update through the pl
 Claude Code plugins can't yet bundle a runnable Workflow script directly, so `plugins/gravity-well/templates/gravity-well.workflow.js` needs a one-time copy per machine:
 
 ```
-cp plugins/gravity-well/templates/gravity-well.workflow.js ~/.claude/workflows/gravity-well.js
+tr -d '\r' < plugins/gravity-well/templates/gravity-well.workflow.js > ~/.claude/workflows/gravity-well.js
 ```
+
+(`tr -d '\r'` rather than plain `cp`: on Windows, git may check the template out with CRLF line endings, and the Workflow tool rejects scripts containing CR bytes — "script contains control characters". The repo's `.gitattributes` forces LF on fresh clones, but existing clones may still carry CRLF.)
 
 Run it with a task description as `args` via the Workflow tool, e.g. `{ name: "gravity-well", args: "add pagination to the users list endpoint" }` — or just use `/gravity-well:orchestrate <task>`, which copies the template into place on first use and then invokes it for you.
 

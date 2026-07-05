@@ -1,0 +1,4 @@
+# Force LF on checkout everywhere. The workflow template is fed to the Workflow
+# tool as a script string, and its permission layer rejects CR bytes as hidden
+# control characters — a Windows autocrlf checkout would corrupt it silently.
+* text=auto eol=lf

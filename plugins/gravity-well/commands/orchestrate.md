@@ -21,8 +21,14 @@ The pipeline edits real files, so:
 
 ## Preferred path: the Workflow script
 
-1. Sync the template: if `~/.claude/workflows/gravity-well.js` is missing OR differs from `${CLAUDE_PLUGIN_ROOT}/templates/gravity-well.workflow.js` (a quick byte comparison settles it), copy the plugin's template over it (creating the directory if needed) and tell the user it was installed/refreshed. Exception: if the user has told you they deliberately customized their copy, ask before overwriting.
-2. Invoke the Workflow tool with `{ name: "gravity-well", args: { task: "<the task above>", scout: <true only if pre-flight step 3 said so> } }` and, when it completes, report the plan, what was implemented, whether it escalated to Opus, and the review verdict with any findings.
+1. Sync the template — **always normalizing line endings**: a Windows checkout of the plugin can leave the template with CRLF, and the Workflow tool rejects CR bytes ("script contains control characters"). Copy with CRs stripped and compare against the stripped form, e.g.:
+   ```
+   mkdir -p ~/.claude/workflows && tr -d '\r' < "${CLAUDE_PLUGIN_ROOT}/templates/gravity-well.workflow.js" > /tmp/gw-template.js
+   cmp -s /tmp/gw-template.js ~/.claude/workflows/gravity-well.js || cp /tmp/gw-template.js ~/.claude/workflows/gravity-well.js
+   ```
+   Tell the user if it was installed/refreshed. Exception: if the user has told you they deliberately customized their copy, ask before overwriting.
+2. Invoke the Workflow tool with `{ name: "gravity-well", args: { task: "<the task above>", scout: <true only if pre-flight step 3 said so> } }`. **`args` must be a real JSON object in the tool call — never a JSON-encoded string.** (A stringified blob reaches the script as one opaque string: the task becomes JSON garbage and the scout flag is ignored.) When it completes, report the plan, what was implemented, whether it escalated to Opus, and the review verdict with any findings.
+3. If the Workflow call is rejected with "script contains control characters" even though the installed file is clean, the permission layer is replaying a stale copy from an earlier attempt — tell the user a fresh session clears it; do not loop on retries.
 
 ## Fallback: chain the agents directly
 
