@@ -55,7 +55,12 @@ Auto-update is **off by default** for git-backed marketplaces like this one, so 
 - **VSCode extension:** `/plugin` → **Marketplaces** tab → click the **refresh icon** (circular arrows, next to the trash icon) on the `flashcosmos-plugins` row, then reload the window.
 - In the terminal client, per-marketplace auto-update can also be flipped on from the `/plugin` panel to make future releases arrive at startup.
 
-**If the version doesn't seem to change after that (VSCode):** the refresh icon updates the marketplace's cached source, but doesn't reliably force the *installed* plugin to resync from it — reloading the window alone isn't enough either. The fix: go to the **Plugins** tab and toggle `gravity-well` **off, then back on**. That forces a fresh resync and is the step that actually picks up the new version. (Note: `/reload-plugins` is not a real command in the VSCode extension — don't rely on it.)
+**If the version doesn't seem to change after that (VSCode):** version resolution has three separate layers on disk — the marketplace's own git clone, a versioned cache per plugin version, and `installed_plugins.json` (the actual pointer every session reads). The refresh icon only updates the first layer; reloading the window alone updates none of them. In practice:
+
+- Toggling `gravity-well` **off, then back on** in the **Plugins** tab pre-fetches the new version into the cache layer, but does **not** reliably rewrite `installed_plugins.json` — sessions can keep reporting the old version indefinitely even after this.
+- The **only reliable fix found so far**: click the **trash icon** on the **Plugins** tab to fully uninstall `gravity-well`, then reinstall it. A real (re)install is what actually rewrites `installed_plugins.json` with the new version, path, and commit SHA — confirm by checking the "installed" version a session reports.
+
+(Note: `/reload-plugins` is not a real command in the VSCode extension — don't rely on it.)
 
 The copied workflow file in `~/.claude/workflows/` doesn't update through the plugin system, but `/gravity-well:orchestrate` re-syncs it automatically whenever it differs from the plugin's template — you only need to re-copy manually if you invoke the Workflow tool directly without the command.
 
