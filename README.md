@@ -52,8 +52,8 @@ Agents and the routing skill are namespaced automatically and are available imme
 Auto-update is **off by default** for git-backed marketplaces like this one, so already-installed users pull new releases manually:
 
 - **Terminal:** `/plugin marketplace update flashcosmos-plugins`, then `/reload-plugins` (or restart) to activate the new version mid-session.
-- **VSCode extension:** `/plugin` → **Marketplaces** tab → select `flashcosmos-plugins` → **Update**, then reload the window.
-- Either client can flip on per-marketplace auto-update from the same panel to make future releases arrive at startup.
+- **VSCode extension:** `/plugin` → **Marketplaces** tab → click the **refresh icon** (circular arrows, next to the trash icon) on the `flashcosmos-plugins` row, then reload the window.
+- In the terminal client, per-marketplace auto-update can also be flipped on from the `/plugin` panel to make future releases arrive at startup.
 
 The copied workflow file in `~/.claude/workflows/` doesn't update through the plugin system, but `/gravity-well:orchestrate` re-syncs it automatically whenever it differs from the plugin's template — you only need to re-copy manually if you invoke the Workflow tool directly without the command.
 
