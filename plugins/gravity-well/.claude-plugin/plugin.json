@@ -2,7 +2,7 @@
   "name": "gravity-well",
   "displayName": "Gravity Well",
   "description": "Routes work across Claude model tiers (Fable for strategy/review, Sonnet/Opus for implementation) to cut token spend without losing quality.",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "author": { "name": "FlashCosmos" },
   "homepage": "https://github.com/FlashCosmos/Gravity-Well",
   "keywords": ["model-routing", "cost-optimization", "subagents"]

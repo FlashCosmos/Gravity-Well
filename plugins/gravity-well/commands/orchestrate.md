@@ -27,8 +27,10 @@ The pipeline edits real files, so:
    cmp -s /tmp/gw-template.js ~/.claude/workflows/gravity-well.js || cp /tmp/gw-template.js ~/.claude/workflows/gravity-well.js
    ```
    Tell the user if it was installed/refreshed. Exception: if the user has told you they deliberately customized their copy, ask before overwriting.
-2. Invoke the Workflow tool with `{ name: "gravity-well", args: { task: "<the task above>", scout: <true only if pre-flight step 3 said so> } }`. **`args` must be a real JSON object in the tool call — never a JSON-encoded string.** (A stringified blob reaches the script as one opaque string: the task becomes JSON garbage and the scout flag is ignored.) When it completes, report the plan, what was implemented, whether it escalated to Opus, and the review verdict with any findings.
-3. If the Workflow call is rejected with "script contains control characters" even though the installed file is clean, the permission layer is replaying a stale copy from an earlier attempt — tell the user a fresh session clears it; do not loop on retries.
+2. Invoke the Workflow tool **by `scriptPath`, not by `name`**, with the absolute path to the synced copy:
+   `{ scriptPath: "<absolute path to ~/.claude/workflows/gravity-well.js>", args: { task: "<the task above>", scout: <true only if pre-flight step 3 said so> } }`
+   By-name invocation has twice been observed failing with "script contains control characters" even when the file on disk is clean — the permission layer replays a stale copy captured at first resolution; `scriptPath` bypasses that path and works. **`args` must be a real JSON object in the tool call — never a JSON-encoded string.** (A stringified blob reaches the script as one opaque string: the task becomes JSON garbage and the scout flag is ignored.) When it completes, report the plan, what was implemented, whether it escalated to Opus, and the review verdict with any findings.
+3. If even the `scriptPath` call is rejected with "script contains control characters", the synced file itself still has CR/tab bytes — verify with a byte count (e.g. `tr -dc '\r' < file | wc -c`), re-run the step 1 sync, and don't loop on identical retries.
 
 ## Fallback: chain the agents directly
 
