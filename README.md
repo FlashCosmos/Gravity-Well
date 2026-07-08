@@ -14,7 +14,7 @@ Gravity Well spreads a task across model tiers instead of running everything thr
 | Implement | `gravity-well:implementer` | Sonnet | Default execution tier for standard work. Signals overload by starting its reply with `ESCALATE:`. |
 | Escalate | `gravity-well:heavy-implementer` | Opus | Reserved for complex, high-stakes, or stalled implementation work. |
 
-The bundled `model-routing` skill teaches the main session when to route (and, just as important, when a task is too small to be worth the handoff), and the `/gravity-well:orchestrate <task>` command runs the whole pipeline end to end on demand.
+The bundled `model-routing` skill teaches the main session when to route (and, just as important, when a task is too small to be worth the handoff). Four commands drive the workflow: `/gravity-well:brainstorm` and `/gravity-well:design-doc` handle the design-first conversation, `/gravity-well:implement <feature>` hands a finished design doc to the pipeline, and `/gravity-well:orchestrate <task>` runs planning-through-review end to end in one shot for smaller changes.
 
 If a `deepseek` MCP server is already registered on the machine, the bundled skill will also suggest it for large, mechanical, multi-file edits. That integration is optional — nothing changes if the server isn't present.
 
@@ -23,14 +23,16 @@ If a `deepseek` MCP server is already registered on the machine, the bundled ski
 The design-first flow, end to end. Use it for anything with real ambiguity — multi-user authority, security, non-obvious data-model decisions. (For a small, obvious change, skip straight to step 5 with a one-line task string.)
 
 1. **Switch to the strategist tier.** Run `/model fable` so the planning conversation happens on the top reasoning tier.
-2. **Talk the feature over.** Discuss it interactively with Fable — the tradeoffs, edge cases, and especially any authority/security surface. This is a real back-and-forth; land the decisions before writing anything down.
-3. **Have Fable emit the design doc.** When you've converged, ask: *"emit our decision as a design doc using the template in `plugins/gravity-well/templates/design-doc-template.md`."* Fable writes the filled doc — so the reasoning that made the decisions also records them, with no transcription drift. Save it somewhere in your repo, e.g. `docs/design/<feature>.md`.
+2. **Brainstorm.** Run `/gravity-well:brainstorm` and talk the feature over interactively with Fable — the tradeoffs, edge cases, and especially any authority/security surface. This is a real back-and-forth; land the decisions before writing anything down.
+3. **Emit the design doc.** When you've converged, run `/gravity-well:design-doc`. Fable writes the filled doc using the plugin's template — so the reasoning that made the decisions also records them, with no transcription drift. Save it as `docs/design/<feature>.md`.
 4. **Confirm it's ready.** The doc must have zero `FILL:` markers left, Status set to "Ready for implementation", and an empty "Open questions" section. (`grep FILL: docs/design/<feature>.md` returning nothing is the quick check.)
 5. **Hand it to the pipeline.** Run:
 
    ```
-   /gravity-well:orchestrate Implement the design in docs/design/<feature>.md; it's already decided — verify it against the code and formalize a plan, don't re-litigate the decisions.
+   /gravity-well:implement <feature>
    ```
+
+   using just the filename stem — no `docs/design/` prefix, no `.md` — and it expands to a full `/gravity-well:orchestrate` call pointed at that doc.
 
    The pipeline plans (Fable) → implements (Sonnet, or Opus if warranted) → reviews (Fable), then hands you back the plan, what changed, whether it escalated, and the review verdict.
 
@@ -83,7 +85,7 @@ The pipeline chains Plan (Fable) → Implement → Review (Fable). The strategis
 
 ### Design docs (best results on ambiguous features)
 
-For a feature with real ambiguity — multi-user authority, security, non-obvious data-model decisions — settle the design *before* dispatching. Talk it over interactively with Fable (`/model fable`), then capture the decisions in a doc following [`plugins/gravity-well/templates/design-doc-template.md`](plugins/gravity-well/templates/design-doc-template.md) and hand the pipeline the doc's path instead of a one-line task. The template ships with full authoring instructions and a "no placeholders" readiness gate. Fable can emit the filled doc as the last step of the discussion, so the reasoning that made the decisions also writes them down. Small changes don't need this — a one-line task string is fine.
+For a feature with real ambiguity — multi-user authority, security, non-obvious data-model decisions — settle the design *before* dispatching, using `/gravity-well:brainstorm` → `/gravity-well:design-doc` → `/gravity-well:implement <feature>` as walked through above. The template these commands write to — [`plugins/gravity-well/templates/design-doc-template.md`](plugins/gravity-well/templates/design-doc-template.md) — ships with full authoring instructions and a "no placeholders" readiness gate. Small changes don't need any of this — a one-line task string via `/gravity-well:orchestrate` is fine.
 
 ## Customizing
 
@@ -96,7 +98,7 @@ Tailor which model handles which kind of work by editing:
 | An agent's instructions | The body of `plugins/gravity-well/agents/*.md` |
 | Workflow phases, escalation, or fix rounds (`MAX_FIX_ROUNDS`) | `plugins/gravity-well/templates/gravity-well.workflow.js` (re-copy after editing) |
 | The design-doc template sections or instructions | `plugins/gravity-well/templates/design-doc-template.md` |
-| The `/gravity-well:orchestrate` command | `plugins/gravity-well/commands/orchestrate.md` |
+| The slash commands (`brainstorm`, `design-doc`, `implement`, `orchestrate`) | `plugins/gravity-well/commands/*.md` |
 | Metadata or version | `plugins/gravity-well/.claude-plugin/plugin.json` |
 
 Validate changes with `claude plugin validate ./plugins/gravity-well` and bump `version` before publishing. To try changes locally before pushing:
@@ -119,7 +121,7 @@ Gravity Well is additive by design: it ships no `settings.json` and never edits 
 plugins/gravity-well/
   .claude-plugin/plugin.json         Plugin manifest
   agents/                            strategist, implementer, heavy-implementer
-  commands/                          /gravity-well:orchestrate
+  commands/                          brainstorm, design-doc, implement, orchestrate
   skills/model-routing/              Routing guidance
   templates/                         Workflow script + design-doc template
 ```
