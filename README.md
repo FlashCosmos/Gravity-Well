@@ -14,18 +14,42 @@ Gravity Well spreads a task across model tiers instead of running everything thr
 | Implement | `gravity-well:implementer` | Sonnet | Default execution tier for standard work. Signals overload by starting its reply with `ESCALATE:`. |
 | Escalate | `gravity-well:heavy-implementer` | Opus | Reserved for complex, high-stakes, or stalled implementation work. |
 
-The bundled `model-routing` skill teaches the main session when to route (and, just as important, when a task is too small to be worth the handoff). Four commands drive the workflow: `/gravity-well:brainstorm` and `/gravity-well:design-doc` handle the design-first conversation, `/gravity-well:implement <feature>` hands a finished design doc to the pipeline, and `/gravity-well:orchestrate <task>` runs planning-through-review end to end in one shot for smaller changes.
+The bundled `model-routing` skill teaches the main session when to route (and, just as important, when a task is too small to be worth the handoff).
 
 If a `deepseek` MCP server is already registered on the machine, the bundled skill will also suggest it for large, mechanical, multi-file edits. That integration is optional — nothing changes if the server isn't present.
 
-## How to run a feature through Gravity Well
+## Commands
 
-The design-first flow, end to end. Use it for anything with real ambiguity — multi-user authority, security, non-obvious data-model decisions. (For a small, obvious change, skip straight to step 5 with a one-line task string.)
+There are really only **two things**: a design-first conversation (`brainstorm` → `design-doc`) that produces a spec, and **the pipeline** (`orchestrate`) that plans → implements → reviews. `implement` is not a third thing — it's shorthand that hands a finished design doc to `orchestrate` with the right framing already attached.
+
+| Command | What it does | Writes files? |
+|---|---|---|
+| `/gravity-well:brainstorm` | Talks a feature over with you interactively. No coding, nothing written yet — just converges on the decisions. | No |
+| `/gravity-well:design-doc` | Lists every decision reached in the conversation, confirms with you which doc(s) each belongs in, then writes the design doc(s) from the template. | Yes — `docs/design/<feature>.md` |
+| `/gravity-well:implement <feature>` | Shorthand for `orchestrate`, pre-pointed at `docs/design/<feature>.md` with "this is already decided, verify against the code, don't re-litigate it." | Whatever the pipeline changes |
+| `/gravity-well:orchestrate <task>` | The pipeline itself: plan (Fable) → implement (Sonnet/Opus) → review (Fable). Takes any task string — a design-doc pointer or a one-line ask. | Whatever the pipeline changes |
+
+**When to use which:** a small, obvious change can skip straight to `/gravity-well:orchestrate <one-line task>`. Anything with real ambiguity — multi-user authority, security, non-obvious data-model decisions — should go through the full flow below instead, so the decisions get made deliberately before code gets written.
+
+## The full flow
+
+```
+/gravity-well:brainstorm             talk it through — no code yet
+        │
+        ▼
+/gravity-well:design-doc             confirm the decision list → write docs/design/<feature>.md
+        │
+        ▼
+/gravity-well:implement <feature>    = /gravity-well:orchestrate "Implement docs/design/<feature>.md ..."
+        │
+        ▼
+  plan → implement → review          Fable → Sonnet/Opus → Fable
+```
 
 1. **Switch to the strategist tier.** Run `/model fable` so the planning conversation happens on the top reasoning tier.
 2. **Brainstorm.** Run `/gravity-well:brainstorm` and talk the feature over interactively with Fable — the tradeoffs, edge cases, and especially any authority/security surface. This is a real back-and-forth; land the decisions before writing anything down.
-3. **Emit the design doc.** When you've converged, run `/gravity-well:design-doc`. Fable writes the filled doc using the plugin's template — so the reasoning that made the decisions also records them, with no transcription drift. Save it as `docs/design/<feature>.md`.
-4. **Confirm it's ready.** The doc must have zero `FILL:` markers left, Status set to "Ready for implementation", and an empty "Open questions" section. (`grep FILL: docs/design/<feature>.md` returning nothing is the quick check.)
+3. **Emit the design doc.** When you've converged, run `/gravity-well:design-doc`. Fable first lists every decision reached in the conversation and confirms with you which doc(s) they land in — so a multi-feature conversation can't get silently narrowed to its most recent thread — then writes the filled doc(s) using the plugin's template. Save it as `docs/design/<feature>.md` (or one file per feature if the decisions span more than one).
+4. **Confirm it's ready.** Each doc must have zero `FILL:` markers left, Status set to "Ready for implementation", and an empty "Open questions" section. (`grep FILL: docs/design/<feature>.md` returning nothing is the quick check.)
 5. **Hand it to the pipeline.** Run:
 
    ```

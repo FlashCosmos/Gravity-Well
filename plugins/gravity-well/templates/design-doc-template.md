@@ -29,6 +29,23 @@ HOW TO USE IT (three steps)
        The design is already decided — verify it against the code and formalize
        a plan; do not re-litigate the decisions.
 
+THE COVERAGE RULE — THE DOC IS THE WHOLE CONVERSATION
+  The implementing session reads ONLY this file. It never sees the discussion
+  that produced it. Any decision that isn't written here is LOST — and worse,
+  anything listed under "out of scope" is an active instruction NOT to build it.
+  So before writing the doc:
+    1. Enumerate EVERY decision reached across the entire conversation — not
+       just the ones tied to the most recent topic thread. Long design
+       conversations drift across several connected decisions; all of them
+       count unless the Director says otherwise.
+    2. Show the Director that list and confirm which decisions this doc covers.
+    3. "Out of scope" records the DIRECTOR'S explicit deferrals only. Never
+       move a decided item there on your own judgment — deferring a decision
+       the Director considers settled silently cancels it.
+  If the decisions genuinely span multiple features, write multiple docs (one
+  per feature, fresh template each) — but every decision must land in one of
+  them. Unwritten ≠ deferred; unwritten = deleted.
+
 THE GOLDEN RULE — NO PLACEHOLDERS
   The strategist reads this file LITERALLY. Any leftover template text becomes a
   fake "decision" it plans around or, worse, invents content to fill. So:
